@@ -1,0 +1,17 @@
+{% extends 'search.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+
+    <form action="{{ path('security_login') }}" method="post">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('connexion') }}">
+        <input type="submit" class="btn" value="Connexion">
+    </form>
+
+    <form action="{{ path('security_register') }}" method="post">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+        <input type="submit" class="btn" value="Inscription">
+    </form>
+
+{% endblock %}
