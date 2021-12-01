@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        {# Run `composer require symfony/webpack-encore-bundle`
+           and uncomment the following Encore helpers to start using Symfony UX #}
+        {% block stylesheets %}
+            {#{{ encore_entry_link_tags('app') }}#}
+        {% endblock %}
+
+        {% block javascripts %}
+            {#{{ encore_entry_script_tags('app') }}#}
+        {% endblock %}
+    </head>
+    <body>
+        {% block body %}
+            <h1>Barre de recherche</h1>
+            <form action="{{ path('search') }}" method="post">
+                <div class="form-group">
+                    <input class="form-control" name="isbn" type="text" id="search-isbn" value="" placeholder="Rechercher un isbn"/>
+                    <input type="submit" value="Valider">
+                </div>
+            </form>
+
+            <form action="{{ path('security_logout') }}" method="post">
+                <input type="submit" value="Deconnexion">
+            </form>
+
+            <form action="{{ path('show_library') }}" method="post">
+                <input type="submit" value="Ma bibiothèque">
+            </form>
+        {% endblock %}
+    </body>
+</html>

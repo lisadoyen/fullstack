@@ -1,0 +1,35 @@
+{% extends 'search.html.twig' %}
+
+{% block title %}Register{% endblock %}
+
+{% block body %}
+
+<form action="{{ path('security_login') }}" method="post">
+    {% if error %}
+        <div class="error">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}
+    <h2>Bienvenue</h2>
+    <div class="input-div one">
+        <div class="i">
+            <i class="fas fa-user"></i>
+        </div>
+        <div class="div">
+            <h5>Utilisateur</h5>
+            <input type="text" class="input" required name="_username">
+        </div>
+    </div>
+    <div class="input-div pass">
+        <div class="i">
+            <i class="fas fa-lock"></i>
+        </div>
+        <div class="div">
+            <h5>Mot de passe</h5>
+            <input type="password" class="input" required name="_password">
+        </div>
+    </div>
+    <a class="mdp-oublie" href="#">Mot de passe oublié ?</a>
+    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+    <input type="submit" class="edit-btn" value="Connexion">
+</form>
+
+{% endblock %}
