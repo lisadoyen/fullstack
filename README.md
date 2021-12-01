@@ -18,7 +18,7 @@ une fois qu'un fichier a été modifié, vous souhaitez le mettre sur Github :
 2. se mettre dans le bon dossier
 
 les commandes à taper :
-- ``git checkout nom_branche``
+- ``git checkout checkpoint``
 - ``git add nom_fichier_modifié``
 - ``git commit -m "commentaire sur la modification effectuée"``
-- ``git push origin main``
+- ``git push origin checkpoint``
