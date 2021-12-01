@@ -7,6 +7,7 @@ use App\Entity\Book;
 use App\Entity\Library;
 use App\Entity\Status;
 use App\Entity\Tag;
+use App\Entity\User;
 use App\Repository\BookRepository;
 use App\Repository\TagRepository;
 use DateTime;
@@ -139,6 +140,11 @@ class LivreApi
     public function getBook($isbn){
         $book = $this->entityManager->getRepository(Book::class)->findOneByIsbn($isbn);
         return $book;
+    }
+
+    public function getBooks(){
+        $books = $this->entityManager->getRepository(Book::class)->findAll();
+        return $books;
     }
 
 }
