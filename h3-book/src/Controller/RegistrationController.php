@@ -134,10 +134,9 @@ class RegistrationController extends AbstractController
      * @return Response
      * @throws \HttpException
      */
-    public function login(Request $request, UserPasswordHasherInterface $hasher): Response
+    public function login(Request $request, UserPasswordHasherInterface $hasher, SerializerInterface $serializer): Response
     {
         $params = json_decode($request->getContent(), true);
-        var_dump($params);
         if(!isset($params['password']) || empty($params['password'])){
             throw new HttpException(400, 'missing parameter');
         }
@@ -163,8 +162,12 @@ class RegistrationController extends AbstractController
             'firstName' => $user->getfirstName(),
             'email' => $user->getEmail()
         ];
+        $resultats = $serializer->serialize(
+            $returnArray,
+            'json'
+        );
 
-        return $this->json($returnArray);
+        return new JsonResponse($resultats, 200, [], true);
     }
 
 
