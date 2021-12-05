@@ -70,13 +70,32 @@ class LivreApiController extends AbstractController
      */
     public function showBookByIsbn(SerializerInterface $serializer, $isbn){
         $book = $this->getDoctrine()->getManager()->getRepository(Book::class)->findOneByIsbn($isbn);
+        $tags = [];
+        foreach($book->getTags() as $tag){
+            $tab_tag = [];
+            $tab_tag['id'] = $tag->getId();
+            $tab_tag['wording'] = $tag->getWording();
+            array_push($tags, $tab_tag);
+        }
+        $returnArray = [
+            'id' => $book->getId(),
+            'title' => $book->getTitle(),
+            'subtitle' => $book->getSubtitle(),
+            'isbn' => $book->getIsbn(),
+            'image' => $book->getImage(),
+            'editor' => $book->getEditor(),
+            'author' => $book->getAuthor(),
+            'publishDate' => $book->getPublishDate()->format('d/m/Y'),
+            'description' => $book->getDescription(),
+            'language' => $book->getLanguage(),
+            'categorie' => $book->getCategorie(),
+            'ageRange' => $book->getAgeRanges()->getWording(),
+            'tags' =>  $tags
+        ];
+
         $resultats = $serializer->serialize(
-            $book,
-            'json',
-            [AbstractNormalizer::ATTRIBUTES =>
-                ['id', 'title', 'image', 'isbn'
-                ]
-            ]
+            $returnArray,
+            'json'
         );
         // DATA, code_statut HTTP, tableau de contexte , json : true
         return new JsonResponse($resultats, 200, [], true);
@@ -105,7 +124,8 @@ class LivreApiController extends AbstractController
             $library,
             'json',
             [AbstractNormalizer::ATTRIBUTES =>
-                ['id', 'title', 'image', 'isbn'
+                ['id', 'title', 'image', 'isbn', 'editor', 'author', 'publish_date', 'description',
+                    'language', 'categorie'
                 ]
             ]
         );
@@ -115,10 +135,13 @@ class LivreApiController extends AbstractController
     }
 
     /**
-     * @Route ( "/showLibrary", name="show_library")
+     * @Route ( "/showlibrary/{userId}", name="show_library_user")
+     * @param $userId
+     * @param SerializerInterface $serializer
      * @return Response
      */
-    public function showLibrary($id, UserInterface $user, SerializerInterface $serializer){
+    public function showLibrary($userId, SerializerInterface $serializer, UserRepository $userRepository){
+        $user = $userRepository->findOneById($userId);
         $library = $user->getLibrary();
         $booksInLibrary = $library->getBooks();
 
@@ -170,7 +193,8 @@ class LivreApiController extends AbstractController
             $books,
             'json',
             [AbstractNormalizer::ATTRIBUTES =>
-                ['id', 'title', 'image', 'isbn'
+                ['id', 'title', 'image', 'isbn', 'editor', 'author', 'description',
+                    'language', 'categorie', 'publishDate'
                 ]
             ]
         );
