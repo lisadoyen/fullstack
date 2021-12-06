@@ -3,8 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\Book;
-use App\Entity\Library;
-use App\Entity\Status;
 use App\Entity\Tag;
 use App\Repository\BookRepository;
 use App\Repository\LibraryRepository;
@@ -17,11 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 class LivreApiController extends AbstractController
@@ -77,6 +71,7 @@ class LivreApiController extends AbstractController
             $tab_tag['wording'] = $tag->getWording();
             array_push($tags, $tab_tag);
         }
+
         $returnArray = [
             'id' => $book->getId(),
             'title' => $book->getTitle(),
@@ -143,19 +138,146 @@ class LivreApiController extends AbstractController
     public function showLibrary($userId, SerializerInterface $serializer, UserRepository $userRepository){
         $user = $userRepository->findOneById($userId);
         $library = $user->getLibrary();
-        $booksInLibrary = $library->getBooks();
+
+        $books = [];
+        foreach($library->getBooks() as $book){
+            $tab_book = [];
+            $tab_book['id'] = $book->getId();
+            $tab_book['image'] = $book->getImage();
+            $tab_book['isbn'] = $book->getIsbn();
+            $tab_book['title'] = $book->getTitle();
+            array_push($books, $tab_book);
+        }
+        $returnArray = [
+            'id' => $library->getId(),
+            'books' => $books
+        ];
 
         $resultats = $serializer->serialize(
-            $booksInLibrary,
+            $returnArray,
             'json',
-            [AbstractNormalizer::ATTRIBUTES =>
-                ['id', 'title', 'image', 'isbn'
-                ]
-            ]
         );
 
         // DATA, code_statut HTTP, tableau de contexte , json : true
         return new JsonResponse($resultats, 200, [], true);
+    }
+
+    /**
+     * @Route ( "/verify/{userId}/{bookId}", name="add_book_verify")
+     * @param $userId
+     * @param SerializerInterface $serializer
+     * @return Response
+     */
+    public function verifyBookInLib($userId, $bookId, UserRepository $userRepository,
+                                    SerializerInterface $serializer, BookRepository $bookRepository){
+
+        $user = $userRepository->findOneById($userId);
+        $library = $user->getLibrary();
+        $book = $bookRepository->findOneById($bookId);
+        if($library->getBooks()->contains($book)){
+            $resultats = $serializer->serialize(
+                true,
+                'json',
+            );
+            return new JsonResponse($resultats, 200, [], true);
+        }else{
+            $resultats = $serializer->serialize(
+                false,
+                'json',
+            );
+            return new JsonResponse($resultats, 200, [], true);
+        }
+
+    }
+
+    /** @Route( "/getuser/{userId}", name="get_userId")
+     *
+     */
+    public function getUserId($userId, UserRepository $userRepository, SerializerInterface $serializer){
+        $user = $userRepository->findOneById($userId);
+        $resultats = $serializer->serialize(
+            $user->getId(),
+            'json',
+        );
+        return new JsonResponse($resultats, 200, [], true);
+    }
+    /**
+     * @Route ( "/recommendation/{userId}/{bookId}", name="add_book_verify")
+     * @param $userId
+     * @param SerializerInterface $serializer
+     * @return Response
+     */
+    public function recommendationProfil($userId, $bookId, BookRepository $bookRepository, UserRepository $userRepository,
+                                         LibraryRepository $libraryRepository, SerializerInterface $serializer){
+        $user = $userRepository->findOneById($userId);
+        $library = $user->getLibrary();
+        $book = $bookRepository->findOneById($bookId);
+
+        $libraries = $libraryRepository->findAll();
+
+        $users = [];
+        foreach($libraries as $librarie){
+            $userTemp = [];
+            $libUser = $librarie->getUser();
+            if($librarie->getBooks()->contains($book)){
+                if($libUser != $user) {
+                    $userTemp['id'] = $libUser->getId();
+                    $userTemp['lastName'] = $libUser->getLastName();
+                    $userTemp['firstName'] = $libUser->getFirstName();
+                    $userTemp['picture'] = $libUser->getPicture();
+                    array_push($users, $userTemp);
+                }
+            }
+        }
+
+        $resultats = $serializer->serialize(
+            $users,
+            'json',
+        );
+        return new JsonResponse($resultats, 200, [], true);
+
+    }
+
+    /**
+     * @Route ( "/recommendationTag/{bookId}", name="recom_tag")
+     * @param $userId
+     * @param SerializerInterface $serializer
+     * @return Response
+     */
+    public function recommendationTag($bookId, BookRepository $bookRepository, SerializerInterface $serializer){
+
+        $book = $bookRepository->findOneBy(['id' => $bookId]);
+
+        $tags = $book->getTags();
+
+        $books = [];
+        foreach ($tags as $tag) {
+            foreach ($tag->getBooks() as $tagBook) {
+                $tempBook = [];
+                $tempBook['id'] = $tagBook->getId();
+                $tempBook['title'] = $tagBook->getTitle();
+                $tempBook['image'] = $tagBook->getImage();
+                $tempBook['isbn'] = $tagBook->getIsbn();
+                $tempBook['categorie'] = $tagBook->getCategorie();
+                $tempBook['editor'] = $tagBook->getEditor();
+
+                $temptags = [];
+                foreach ($tagBook->getTags() as $tagBookTag) {
+                    $tempTag = [];
+                    $tempTag['id'] = $tagBookTag->getId();
+                    $tempTag['wording'] = $tagBookTag->getWording();
+                    array_push($temptags, $tempTag);
+                }
+                $tempBook['tags'] = $temptags;
+                if(!(in_array($tempBook,$books)) and $tempBook['id'] != $book->getId()) array_push($books, $tempBook);
+            }
+        }
+        $resultats = $serializer->serialize(
+            $books,
+            'json',
+        );
+        return new JsonResponse($resultats, 200, [], true);
+
     }
 
     /**

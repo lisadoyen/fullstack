@@ -26,9 +26,10 @@ class Library
     private $user;
 
     /**
-     * @ORM\OneToMany(targetEntity=Book::class, mappedBy="librairies")
+     * @ORM\ManyToMany(targetEntity=Book::class, mappedBy="libraries")
      */
     private $books;
+
 
 
     public function __construct()
@@ -76,7 +77,7 @@ class Library
     {
         if (!$this->books->contains($book)) {
             $this->books[] = $book;
-            $book->setLibrairies($this);
+            $book->addLibrary($this);
         }
 
         return $this;
@@ -85,12 +86,10 @@ class Library
     public function removeBook(Book $book): self
     {
         if ($this->books->removeElement($book)) {
-            // set the owning side to null (unless already changed)
-            if ($book->getLibrairies() === $this) {
-                $book->setLibrairies(null);
-            }
+            $book->removeLibrary($this);
         }
 
         return $this;
     }
+
 }

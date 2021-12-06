@@ -92,14 +92,17 @@ class Book
     private $ageRanges;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Library::class, inversedBy="books")
+     * @ORM\ManyToMany(targetEntity=Library::class, inversedBy="books")
      */
-    private $librairies;
+    private $libraries;
+
+
 
     public function __construct()
     {
         $this->tags = new ArrayCollection();
         $this->opinions = new ArrayCollection();
+        $this->libraries = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -299,15 +302,29 @@ class Book
         return $this;
     }
 
-    public function getLibrairies(): ?Library
+    /**
+     * @return Collection|Library[]
+     */
+    public function getLibraries(): Collection
     {
-        return $this->librairies;
+        return $this->libraries;
     }
 
-    public function setLibrairies(?Library $librairies): self
+    public function addLibrary(Library $library): self
     {
-        $this->librairies = $librairies;
+        if (!$this->libraries->contains($library)) {
+            $this->libraries[] = $library;
+        }
 
         return $this;
     }
+
+    public function removeLibrary(Library $library): self
+    {
+        $this->libraries->removeElement($library);
+
+        return $this;
+    }
+
+
 }
