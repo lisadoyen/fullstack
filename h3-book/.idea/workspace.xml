@@ -137,6 +137,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../h3-frontend" />
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="php.override.implement.member.chooser.php.doc" value="NONE" />
+    <property name="ts.external.directory.path" value="C:\Program Files\JetBrains\PhpStorm 2020.2.1\plugins\JavaScriptLanguage\jsLanguageServicesImpl\external" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -152,7 +153,8 @@
       <workItem from="1638204425840" duration="231000" />
       <workItem from="1638204726570" duration="30879000" />
       <workItem from="1638270479283" duration="70069000" />
-      <workItem from="1638441233030" duration="29004000" />
+      <workItem from="1638441233030" duration="46466000" />
+      <workItem from="1638768035354" duration="4806000" />
     </task>
     <servers />
   </component>
